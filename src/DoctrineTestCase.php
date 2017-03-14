@@ -20,7 +20,7 @@ abstract class DoctrineTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @inheritdoc
      */
-    public function setUp()
+    protected function setUp()
     {
         if (!class_exists('Doctrine\ORM\EntityManager')) {
             $this->markTestSkipped(sprintf('The test "%s" is not available : Doctrine ORM is not available.', get_class($this)));
