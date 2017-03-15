@@ -4,6 +4,7 @@ namespace MeetNeedz\TestTools;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\SchemaTool;
 
 /**
  * Class DoctrineTestCase
@@ -40,12 +41,21 @@ abstract class DoctrineTestCase extends \PHPUnit_Framework_TestCase
 
         $this->entityManager = EntityManager::create($connectionSettings, $configuration);
 
-        $entitiesClass = [];
         $entities = $this->getEntities();
+
+        // Creating the schema
+        $entityClasses = [];
         foreach ($entities as $entity) {
-            if (in_array(get_class($entity), $entitiesClass) === false) {
-                $entitiesClass[] = get_class($entity);
+            if (in_array(get_class($entity), $entityClasses) === false) {
+                $entityClasses[] = $this->entityManager->getClassMetadata(get_class($entity));
             }
+        }
+        $schemaTool = new SchemaTool($this->entityManager);
+
+        $schemaTool->createSchema($entityClasses);
+
+        // Storing the entities
+        foreach ($entities as $entity) {
             $this->entityManager->persist($entity);
         }
         $this->entityManager->flush();
